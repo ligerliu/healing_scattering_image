@@ -5,7 +5,17 @@ from scipy.io import loadmat
 from scipy import ndimage
 plt.close('all')
 
-sample = '/Users/jiliangliu/Desktop/CMS_for_ML/2011_04Apr_30-Fang_shapedNPs/mini_image/lin_bs-CB_ring_top_20sec_frame9_SAXS.mat'
+#sample = ('/Users/jiliangliu/Desktop/CMS_for_ML/\
+#2011_04Apr_30-Fang_shapedNPs/mini_image/\
+#lin_bs-CB_ring_top_20sec_frame9_SAXS.mat')
+
+sample = ('/Users/jiliangliu/Desktop/CMS_for_ML/\
+2011_04Apr_30-Fang_shapedNPs/mini_image/\
+lin_bs-direct_60sec_SAXS.mat')
+
+#sample = ('/Users/jiliangliu/Desktop/CMS_for_ML/\
+#2016_11Nov_17-First_samples/mini_image/\
+#ChunliMa_2p7GPa_0004.mat')
 im = loadmat(sample)['detector_image'].astype(float)
 
 im[175:180,:] = np.nan
@@ -85,6 +95,7 @@ delta_width = 1
 
 qphi_image_1[qphi_image_1==1e-6] = np.nan
 
+
 for _ in range(r_max):
     if (np.size(qphi_image_3[np.isnan(qphi_image_3[:,_])==0,_]) >
        angle_resolution/10):
@@ -119,29 +130,92 @@ for _ in range(r_max):
     iso_std[_]  = np.std(Ave_I_mean[len_nonnan_Ave_I:2*len_nonnan_Ave_I])
     iso_judge_local_vs_global[_] = iso_local_std[_] / iso_std[_]
     
-x,y = np.histogram(iso_judge_global[np.isnan(iso_judge_global)==0] ,bins=30)
-#make x,y elements corresponisible
-y = y[:-1] + np.diff(y)/2
 
 from scipy.misc import factorial
-
+from scipy.optimize import curve_fit
 def poisson_func(k,Lambda):
     return ((Lambda*1.)**k/factorial(k))*np.exp(-Lambda)
 
-from scipy.optimize import curve_fit
-
-k = np.arange(1,31,1)
-
-if (np.size(x[np.isnan(x)]) > 0) or (np.size(x[x==0]) == len(x)):
-   #return np.zeors(np.shape(im))
-   print('break')
-lamb = curve_fit(poisson_func,k,x*1./np.nansum(x),bounds = [0,np.inf])[0][0]
-
-x1,y1 = np.histogram(iso_judge_local_vs_global[
+bkgd_threshold  = 0.2
+peaks_threshold = 3
+def determine_scattering_class(iso_judge_global,
+                               iso_judge_local_vs_global,
+                               bkgd_threshold,
+                               peaks_threshold,
+                               hist_bins = 30)
+    
+    # y is the 
+    x,y = np.histogram(iso_judge_global[np.isnan(iso_judge_global)==0] ,bins=hist_bins)
+    #make x,y elements corresponisible
+    y = y[:-1] + np.diff(y)/2
+    k = np.arange(1,hist_bins+1,1)
+    
+    if (np.size(x[np.isnan(x)]) > 0) or (np.size(x[x==0]) == len(x)):
+       #return np.zeors(np.shape(im))
+       print('break')
+       break
+    
+    lambda_global = curve_fit(poisson_func,k,x*1./np.nansum(x),bounds = [0,np.inf])[0][0]
+    # y1 is the histogram of 
+    x1,y1 = np.histogram(iso_judge_local_vs_global[
                     (np.abs(iso_judge_local_vs_global) != np.inf) &
                     (np.isnan(iso_judge_local_vs_global) == 0)], 
-                    bins = 30)
-y1 = y1[1:] + np.diff(y1)/2.
-lamb1 = curve_fit(poisson_func,k,x1*1./np.nansum(x1),bounds = [np.argmax(x1)-1,np.argmax(x1)+1])[0][0]
+                    bins = hist_bins)
+    y1 = y1[1:] + np.diff(y1)/2.
+    lambda_local_vs_global = curve_fit(poisson_func,k,x1*1./np.nansum(x1),\
+                            bounds = [np.argmax(x1)-1,np.argmax(x1)+1])[0][0]
+    
+    if (np.abs(1-y1[lambda_local_vs_global.astype(int)]) < bkgd_threshold):
+       aniso_bkgd_judge = False
+       if lambda_global <= peaks_threshold:
+          peaks_judge = True
+       else:
+          peaks_judge = False
+    else:
+       aniso_bkgd_judge = True
+       if lambda_global <= peaks_threshold:
+          peaks_judge = True
+       else:
+          peaks_judge = False
+    return aniso_bkgd_judge,peaks_judge,lambda_global,lambda_local_vs_global,y,y1
 
+def heal_iso_bkgd_no_peaks(I,
+                           lamda_gloabl,
+                           lambda_local_vs_global,
+                           lambda_threshold_1 = 2.
+                           radius,
+                           r_min = 0,
+                           r_max,
+                           y
+                           ):
+    
+    aniso_judge = ((iso_judge_global>
+                    y[(lambda_global+lambda_threshold_1*lambda_global**.5).astype(int)])
+                    &((iso_local_vs_global)<0.8)).astype(int)
+    for _ in range(r_min,r_max):
+        I_radius = im[radius == _]
+        I_radius = I[_]
+        im[radius == _] = IR
+    
+    return im,aniso_judge
+def consecutive(data):
+    return np.split(data.T, np.where(np.diff(data) != 1)[0] +1)
+def heal_iso_bkgd_peaks(I,
+                        lambda_global,
+                        lambda_local_vs_global,
+                        lambda_threshold_1 = 2.,
+                        lambda_threshold_2 = 2.,
+                        radius,
+                        r_min = 0,
+                        r_max,
+                        y,
+                        y1
+                        ):
+    
+    aniso_judge = ((iso_judge_global>
+                    y[(lambda_global+lambda_threshold_1*lambda_global**.5).astype(int)])
+                    &((iso_local_vs_global)
+                    <y1[(lambda_local_vs_global -
+                    lambda_threshold_2*lambda_local_vs_global**.5).astype(int)])).astype(int)
+    
 plt.show()
