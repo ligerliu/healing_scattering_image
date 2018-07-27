@@ -38,21 +38,21 @@ class oneD_intensity:
         self.mask = kwargs['mask'] if 'mask' in kwargs else None
         self.dilution = True if 'dilution' in kwargs else False
         self.dilution_size = kwargs['dilution_size'] if 'dilution_size' in kwargs else None
-          
-        
+
+
     def cir_ave(self):
-        
+
         def polar_coord(self):
             shape_ind = np.asarray(shape(self.im))
             x = np.arange(1,shape_ind[1]+1,1)
             y = np.arange(1,shape_ind[0]+1,1)
             #xx is column index of input image, yy is row index of input image
-            xx , yy = np.meshgrid(x, y) 
+            xx , yy = np.meshgrid(x, y)
             # produce the x-coord for matrix with origin at scattering center
             xx = xx - self.xcenter
             # produce the y-coord for matrix with origin at scattering center
             yy = yy - self.ycenter
-            #produce azimuth coord 
+            #produce azimuth coord
             azimuth = np.arctan(yy/xx)
             azimuth = azimuth  + (xx<0)*pi +((xx>=0)&(yy<0))*2*pi
             #produce radius coord
@@ -60,7 +60,7 @@ class oneD_intensity:
             radius = np.round(radius)
             radius = radius.astype(int)
             return radius,azimuth
-        
+
         def make_mask(self):
             if self.mask is None:
                 mask1 = self.im > self.in_max
@@ -71,7 +71,7 @@ class oneD_intensity:
                     mask2 = ndimage.binary_dilation(mask2,structure=np.ones((dilution_size,dilution_size)))
                 mask3 = radius>self.radius_bins
                 mask = (mask1)|(mask2)|(mask3)
-            else: 
+            else:
                 mask1 = self.im > self.in_max
                 mask2 = self.im < self.in_min
                 if self.dilution == True:
@@ -81,10 +81,10 @@ class oneD_intensity:
                 mask3 = radius>self.radius_bins
                 mask = (mask1)|(mask2)|(mask3)
                 mask = (self.mask)|(mask1)|(mask2)|(mask3)
-            return mask 
-            
+            return mask
+
         radius,azimuth = polar_coord(self)
-        im = self.im            
+        im = self.im
         mask = make_mask(self)
         mask = mask>0
         a = radius[~mask]
@@ -92,12 +92,12 @@ class oneD_intensity:
         val = np.zeros((self.radius_bins+1,))
         #for j in range(self.radius_bins):
         #    val[j] = accum_np(a, b, j)
-        
+
         intensity = np.bincount(a.flatten(),weights=b.flatten())
         counts = np.bincount(a.flatten())
-        
+
         val[0:len(intensity)] = intensity/counts
-        
+
         return val
 
 def polar_coord(im,xcenter,ycenter,bins):
@@ -107,13 +107,13 @@ def polar_coord(im,xcenter,ycenter,bins):
     x_axis = np.arange(1,shape_ind[1]+1,1)#this is obtain from experimental setup
     y_axis = np.arange(1,shape_ind[0]+1,1)
     xcenter = float(xcenter)   # x coordinate of scattering center
-    ycenter = float(ycenter) # y coordinate of scattering center 
-    
-    
-    xx , yy = np.meshgrid(x_axis, y_axis) 
-    xx = xx - xcenter 
+    ycenter = float(ycenter) # y coordinate of scattering center
+
+
+    xx , yy = np.meshgrid(x_axis, y_axis)
+    xx = xx - xcenter
     # produce the x-coord for matrix with origin at scattering center
-    yy = yy - ycenter 
+    yy = yy - ycenter
     # produce the y-coord for matrix with origin at scattering center
     azimuth = np.arctan(yy/xx)
     # arctan was specific for the N-D array calculation, atan only work for 1-D array
@@ -122,8 +122,8 @@ def polar_coord(im,xcenter,ycenter,bins):
     radius = np.round(radius)
     radius = radius.astype(int)
     angle = np.round(np.round(azimuth*(bins/360)/pi*180)).astype(int)
-    return radius,angle 
-    
+    return radius,angle
+
 def polar_coord_float(im,xcenter,ycenter,bins):
     #should be able to change 360 to 720 by change the delta phi
     shape_ind = np.asarray(shape(im))
@@ -131,13 +131,13 @@ def polar_coord_float(im,xcenter,ycenter,bins):
     x_axis = np.arange(1,shape_ind[1]+1,1)#this is obtain from experimental setup
     y_axis = np.arange(1,shape_ind[0]+1,1)
     xcenter = float(xcenter)   # x coordinate of scattering center
-    ycenter = float(ycenter) # y coordinate of scattering center 
-    
-    
-    xx , yy = np.meshgrid(x_axis, y_axis) 
-    xx = xx - xcenter 
+    ycenter = float(ycenter) # y coordinate of scattering center
+
+
+    xx , yy = np.meshgrid(x_axis, y_axis)
+    xx = xx - xcenter
     # produce the x-coord for matrix with origin at scattering center
-    yy = yy - ycenter 
+    yy = yy - ycenter
     # produce the y-coord for matrix with origin at scattering center
     azimuth = np.arctan(yy/xx)
     # arctan was specific for the N-D array calculation, atan only work for 1-D array
@@ -153,13 +153,13 @@ def qphi_image(im,xcenter,ycenter,r_min,r_max,bins):
     x_axis = np.arange(1,shape_ind[1]+1,1)#this is obtain from experimental setup
     y_axis = np.arange(1,shape_ind[0]+1,1)
     xcenter = float(xcenter)   # x coordinate of scattering center
-    ycenter = float(ycenter) # y coordinate of scattering center 
-    
-    
-    xx , yy = np.meshgrid(x_axis, y_axis) 
-    xx = xx - xcenter 
+    ycenter = float(ycenter) # y coordinate of scattering center
+
+
+    xx , yy = np.meshgrid(x_axis, y_axis)
+    xx = xx - xcenter
     # produce the x-coord for matrix with origin at scattering center
-    yy = yy - ycenter 
+    yy = yy - ycenter
     # produce the y-coord for matrix with origin at scattering center
     azimuth = np.arctan(yy/xx)
     # arctan was specific for the N-D array calculation, atan only work for 1-D array
@@ -181,7 +181,7 @@ def qphi_image(im,xcenter,ycenter,r_min,r_max,bins):
 
 
 def apply_two_fold_symmetry(im):
-    
+
     imul = np.zeros((np.round(np.max([shape(im)[0]-ycenter,ycenter]))*2,np.round(np.max([shape(im)[1]-xcenter,xcenter]))*2))*np.nan
     imul[:shape(im)[0],:shape(im)[1]] = np.copy(im)
     imdr = flipud(fliplr(imul))
@@ -198,7 +198,7 @@ def apply_two_fold_symmetry(im):
     imul[isnan(imul)] = imdr[isnan(imul)]
     im=np.copy(imul[:shape(im)[0],:shape(im)[1]])
     return im
-   
+
 def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_fit_bias=4,fold_bias=4,fittness_threshold=64,extreme_fitness=1e-3,fittness_porior=True,down_sample=.1,lamda_threshold_1=1.,lamda_threshold_2=1.,lamda_threshold_3=1.,bkgd_threshold=.2,fitting_shift=True,two_fold_apply =True):
     #angle_resolution=720
     #r_max=2000#np.max(shape(im))
@@ -214,7 +214,7 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
     qphi_image1[isnan(qphi_mask)]=np.nan
     qphi_mask2=(qphi_image1==1e-6)
     #print time.time()-t
-    #np.roll could apply on 2D image, 
+    #np.roll could apply on 2D image,
     #but skimage inpaint is not very well perfomred on x-ray data reconstruction
     qphi_image1[qphi_image1==0]=1e-6
     qphi_image1[qphi_image1<1e-6]=1e-6
@@ -227,17 +227,17 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
     qphi_image3[qphi_image3==-6]=np.nan
     radius,azimuth=polar_coord(im,xcenter,ycenter,angle_resolution)
     r_f,a_f=polar_coord_float(im,xcenter,ycenter,angle_resolution)
-    
+
     I=oneD_intensity(im=im,xcenter=xcenter,ycenter=ycenter,mask=mask).cir_ave()
     I=I[0:r_max]
-    
+
     iso_judge=np.zeros((len(I),))
     iso_local_std=np.zeros((len(I),))
     iso_std=np.zeros((len(I),))
     delta_width = 1
-    
+
     qphi_image1[qphi_image1==1e-6]=np.nan
-    
+
     # standard deviation threshold deteremination
     #calculation of Ave_I bases on qphi_image1 or qphi_image3 is not certain, for very strong diffraction maybe qphi_image3 (log version) is better which could enable judgement on the sigma_loc
     iso_judge1=np.zeros((r_max,))
@@ -245,7 +245,7 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
         if size(qphi_image3[isnan(qphi_image3[:,i])==0,i])>angle_resolution/10:
             iso_judge1[i] = np.std(qphi_image1[isnan(qphi_image1[:,i])==0,i])
         else: iso_judge1[i] = np.nan
-        
+
         if i >delta_width and i<len(I)-delta_width:
             Ave_I=np.sum(qphi_image3[:,i-delta_width:i+delta_width],axis=1)/(2*delta_width)
         elif i<delta_width:
@@ -259,17 +259,17 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
         for h in range(len(Ave_I[isnan(Ave_I)==0]),2*len(Ave_I[isnan(Ave_I)==0])):
             Ave_I_local_std[h-len(Ave_I[isnan(Ave_I)==0])] = np.std(Ave_I_mean[h-int(angle_resolution)/100:h+int(angle_resolution)/100])
         iso_local_std[i]=np.abs(np.nanmean(Ave_I_local_std))
-        iso_std[i]=np.std(Ave_I_mean[len(Ave_I[isnan(Ave_I)==0]):2*len(Ave_I[isnan(Ave_I)==0])]) 
+        iso_std[i]=np.std(Ave_I_mean[len(Ave_I[isnan(Ave_I)==0]):2*len(Ave_I[isnan(Ave_I)==0])])
     x,y =histogram(iso_judge1[isnan(iso_judge1)==0],bins=30)
     y=y[:-1]+np.diff(y)/2
-    
+
     from scipy.misc import factorial
     def poisson_func(k,lamb):
         return ((lamb*1.)**k/factorial(k))*np.exp(-lamb)
-        
+
     from scipy.optimize import curve_fit
     k=np.arange(1,31,1)
-    
+
     #return x,y,k,
     if size(x[isnan(x)])>0 or size(x[x==0])==len(x):
         return np.zeros(shape(im))
@@ -279,14 +279,14 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
     x1,y1 =histogram((iso_local_std/iso_std)[(np.abs(iso_local_std/iso_std)!=inf)&(isnan(iso_local_std/iso_std)==0)],bins=30)
     y1=y1[:-1]+np.diff(y1)/2
     lamb1=curve_fit(poisson_func,k,x1*1./np.sum(x1),bounds=[np.argmax(x1)-1,np.argmax(x1)+1])[0][0]
-        
+
     def polar_gaussian(r,a,mu_r,mu_a,sigma_r,sigma_a,A,mask):
         return mask*A*exp(-(r-mu_r)**2/sigma_r**2/2)*(exp(-(a-mu_a)**2/sigma_a**2/2)+\
-        exp(-(np.round(np.max(a))+a-mu_a)**2/sigma_a**2/2)+exp(-(-np.round(np.max(a))+a-mu_a)**2/sigma_a**2/2))    
-    
+        exp(-(np.round(np.max(a))+a-mu_a)**2/sigma_a**2/2)+exp(-(-np.round(np.max(a))+a-mu_a)**2/sigma_a**2/2))
+
     def TwoD_gaussian(r,a,mu_r,mu_a,sigma_r,sigma_a,A,roll_index,mask):
-        return np.roll(mask*A*exp(-(r-mu_r)**2/sigma_r**2/2)*exp(-(a-mu_a)**2/sigma_a**2/2),int(roll_index),axis=0)  
-        
+        return np.roll(mask*A*exp(-(r-mu_r)**2/sigma_r**2/2)*exp(-(a-mu_a)**2/sigma_a**2/2),int(roll_index),axis=0)
+
     ###
     if (np.abs(1-y1[int(lamb1)])<bkgd_threshold):
         aniso_bkgd_judge=False
@@ -323,9 +323,11 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
             # first three principle components contain low frequency information
             wind_siz=5
             TwoD_local_std_normalized=((im1/L-1)**2+
-                                      signal.convolve2d((im1/L-1)**2,np.ones((wind_siz,wind_siz)),mode='same')*
+                                      signal.convolve2d((im1/L-1)**2,
+                                      np.ones((wind_siz,wind_siz)),mode='same')*
                                       (im1/L-1)/size(np.ones((wind_siz,wind_siz)))-
-                                      2*signal.convolve2d((im1/L-1),np.ones((wind_siz,wind_siz)),mode='same')*
+                                      2*signal.convolve2d((im1/L-1),
+                                      np.ones((wind_siz,wind_siz)),mode='same')*
                                       (im1/L-1)/size(np.ones((wind_siz,wind_siz))))
             # if noise increase as signal increasing, then normalize local std by dividing by low frequency component offsetting noise enhancement due to low frequency domain.
             TwoD_local_std=((im1-L)**2+
@@ -333,12 +335,13 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
                            (im1-L)/size(np.ones((wind_siz,wind_siz)))-
                            2*signal.convolve2d((im1-L),np.ones((wind_siz,wind_siz)),mode='same')*
                            (im1-L)/size(np.ones((wind_siz,wind_siz))))
-            x2,y2 =histogram(log(TwoD_local_std*TwoD_local_std_normalized)[(isnan(log(TwoD_local_std*TwoD_local_std_normalized))==0)],bins=30)
+            x2,y2 =histogram(log(TwoD_local_std*TwoD_local_std_normalized)
+                             [(isnan(log(TwoD_local_std*TwoD_local_std_normalized))==0)],bins=30)
             y2=y2[:-1]+np.diff(y2)/2
             k=np.arange(1,31,1)
             lamb2=curve_fit(poisson_func,k,x2*1./np.sum(x2),bounds=[1,inf])[0][0]
-            #L1 = np.copy(im1) 
-            # the residue after background subtraction may not leads to a gaussian distribution 
+            #L1 = np.copy(im1)
+            # the residue after background subtraction may not leads to a gaussian distribution
             # if there is no sharp reflections, all low frequence componen include noise had been reduced
             L1 = np.copy(L)
             L2 = np.copy(im1)
@@ -349,7 +352,7 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
             L2_mask=ndimage.binary_dilation(L2_mask,np.ones((20,20)))
             L1[L1_mask]=np.nan
             L2[L2_mask]=np.nan
-            
+
             #down_sample=.1
             L1=transform.rescale(L1,down_sample)
             qphi_image_L=qphi_image(L1,
@@ -390,11 +393,11 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
                    np.nanmean(np.abs(qphi_image_L_model-qphi_image_L)
                    [(qphi_image_L_model-qphi_image_L)!=0])*
                    (2-1.*size(kk[kk>0])/size(kk))**bkdg_fit_bias):
-                    
+
                     bkgd_sym_ssd=(np.nanmean(np.abs(qphi_image_L_model-qphi_image_L)
                                  [(qphi_image_L_model-qphi_image_L)!=0])*
                                  (2-1.*size(kk[kk>0])/size(kk))**bkdg_fit_bias)
-                    
+
                     bkgd_sym=num1
                 else:
                     bkgd_sym_ssd=bkgd_sym_ssd
@@ -408,9 +411,9 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
             IB1[IB1==-6]=np.nan
             TwoD_B_model=nanmean(IB1,axis=2)
             #print time.time()-t;plt.show();sys.exit()
-        
-        
-            TwoD_B_model[isnan(TwoD_B_model)]=0  
+
+
+            TwoD_B_model[isnan(TwoD_B_model)]=0
             TwoD_B_healing=np.copy(TwoD_B_model).astype(uint16)
             #from skimage.filters import rank
             #for i in range(30):
@@ -422,7 +425,7 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
             for k in range(bkgd_sym):
                 IB1[:,:,k][isnan(IB1[:,:,k])==1]=TwoD_B_model[isnan(IB1[:,:,k])==1]
                 qphi_image_L2[k*angle_resolution/bkgd_sym:(k+1)*angle_resolution/bkgd_sym,:]=IB1[:,:,k]
-            
+
             #from skimage import transform
             qphi_image_L2=transform.resize(qphi_image_L2,shape(qphi_image1))
             qphi_mask3=qphi_image(L2_mask,xcenter,ycenter,r_min,r_max,angle_resolution)
@@ -435,7 +438,7 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
             qphi_image1[isnan(qphi_mask[:,:r_max])]=np.nan
             qphi_image1[qphi_mask2[:,:r_max]]=1e-6
             #print time.time()-t
-            #np.roll could apply on 2D image, 
+            #np.roll could apply on 2D image,
             #but skimage inpaint is not very well perfomred on x-ray data reconstruction
             #qphi_image1[qphi_image1==0]=1e-6
             qphi_image2=log(np.roll(qphi_image1,90,axis=0))
@@ -445,32 +448,33 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
             qphi_image2[mask2]=-6
             qphi_image3=np.copy(qphi_image2)
             qphi_image3[qphi_image3==-6]=np.nan
-            
+
             iso_judge=np.zeros((len(I),))
             IB_judge1=np.zeros((len(I),))
             for i in range(r_max):
                 IB_judge1[i]=np.std(qphi_image1[qphi_image1[:,i]>1,i])
             x3,y3=histogram(IB_judge1[isnan(IB_judge1)==0],bins=30)
-            lamb3=curve_fit(poisson_func,np.arange(1,31,1),x3*1./np.sum(x3),bounds=[1,inf])[0][0]
+            lamb3=curve_fit(poisson_func,np.arange(1,31,1),x3*1./np.sum(x3),
+                            bounds=[1,inf])[0][0]
             if lamb3>4:
                 pass
             elif lamb3<=4:
                 IB_judge=oneD_intensity(im=L2_mask.astype(int),
                                         xcenter=xcenter,ycenter=ycenter,
                                         mask=mask).cir_ave()
-                
+
                 iso_judge=(IB_judge[:r_max]>
                            (nanmean(IB_judge[:r_max]
                            [IB_judge[:r_max]>0])+
                            1.*np.std(IB_judge[:r_max][IB_judge[:r_max]>0])))
-        elif lamb<=4:# here anisotropic is caused by the background noise no due to symmetrical fold 
+        elif lamb<=4:# here anisotropic is caused by the background noise no due to symmetrical fold
             aniso_bkgd_judge=False
             diffuse=True
             iso_judge=((iso_judge1>
                        y[np.round(lamb+lamda_threshold_3*lamb**.5).astype(int)])
                        &((iso_local_std/iso_std)<.8)).astype(int)
             print('diffuse diffraction')
-    
+
     def consecutive(data,stepsize=1):
         return np.split(data.T,np.where(np.diff(data) != stepsize)[0]+1)
     aniso_span = consecutive(np.where(iso_judge)[0])
@@ -488,10 +492,11 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
             for l in range(r_min,r_max):
                 IR = im[radius==l]
                 FR = interp(a_f[radius==l],
-                         np.arange(0,angle_resolution,1)[isnan(qphi_image6[:,l])==0],
+                         np.arange(0,angle_resolution,1)
+                         [isnan(qphi_image6[:,l])==0],
                          qphi_image6[isnan(qphi_image6[:,l])==0,l])
                 IR[isnan(IR)]=FR[isnan(IR)]
-                im[radius==l]= IR 
+                im[radius==l]= IR
             #figure(6),imshow(im)
             #plt.show()
             print('aniso bkgd no symmetrical folds sharp')
@@ -499,14 +504,14 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
             print(bkgd_sym)
             return im
         #sys.exit()
-    
-    
-    
-    
+
+
+
+
     #sym=np.zeros((len(aniso_span),))
     #radius,azimuth=polar_coord(im,xcenter,ycenter,bins)
     for i in range(len(aniso_span)):
-        
+
         if aniso_bkgd_judge==True:
             #because here already subtract the background and enhance the signal, hence namean is enough
             I1=np.nanmean(qphi_image3[:,aniso_span[i]],axis=1)
@@ -529,7 +534,7 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
                 I1=nanmean(qphi_image3[:,aniso_span[i]],axis=1)
                 I1[~II]=np.nan
                 I1=nanmean(qphi_image3[:,aniso_span[i]],axis=1)
-    
+
         I2=np.copy(I1)
         I2=I2-nanmean(I1)
         I2[I2<0]=0
@@ -540,7 +545,7 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
         Va=np.zeros((4,))
         sym=0
         fold_bias=fold_bias
-        
+
         if aniso_bkgd_judge==False:
             if diffuse==False:
                 fittness_threshold=fittness_threshold# for **.5 use 16, **1 use 32
@@ -548,45 +553,64 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
                 fittness_threshold=fittness_threshold/2.
                 fold_bias=fold_bias/2.
         else:fittness_threshold=fittness_threshold/4.
-        
+
         for j in range(len(sym_fold)):
             # inequal background and tiltation of sample caused aniso distribution require the normalization here
-            model=nanmean(reshape(I1,(sym_fold[j],angle_resolution/sym_fold[j])).T,axis=1)
+            model=nanmean(reshape(I1,(sym_fold[j],
+                          angle_resolution/sym_fold[j])).T,axis=1)
             K=reshape(I1,(sym_fold[j],angle_resolution/sym_fold[j])).T
             kk=isnan(K)==0
             kk=np.sum(kk.astype(int),axis=1)
-            Va[j] = nanmean(np.abs(I1-np.tile(model,sym_fold[j]))**2)**1*(2-1.*sym_fold[j]*size(kk[kk>1])/angle_resolution)**fold_bias
-        
+            Va[j] = (nanmean(np.abs(I1-
+                            np.tile(model,sym_fold[j]))**2)**1
+                            *(2-1.*sym_fold[j]*size(kk[kk>1])/
+                            angle_resolution)**fold_bias)
+
         Va[Va==0]=6
         fittness_porior=True
-        if mean(iso_judge1[isnan(iso_judge1)==0])/mean(I[isnan(I)==0])/fittness_threshold>extreme_fitness:
+        if mean(iso_judge1[isnan(iso_judge1)==0])/\
+        mean(I[isnan(I)==0])/fittness_threshold>extreme_fitness:
             extreme_fitness=extreme_fitness
-        else: extreme_fitness=mean(iso_judge1[isnan(iso_judge1)==0])/mean(I[isnan(I)==0])/fittness_threshold
-        
+        else: extreme_fitness=mean(iso_judge1[isnan(iso_judge1)==0])/\
+        mean(I[isnan(I)==0])/fittness_threshold
+
         if size(Va[Va<extreme_fitness])>1:
             sym = np.max(sym_fold[np.where(Va<extreme_fitness)[0]])
-        else:    
+        else:
             if fittness_porior==True:
                 sym = sym_fold[np.argmin(Va)]
-            else: # try to bias to  maximum symmtric   
-                if np.min(np.round(np.log(Va)))<=np.round(log(mean(iso_judge1[isnan(iso_judge1)==0])/mean(I[isnan(I)==0])/fittness_threshold)):#-3.:
+            else: # try to bias to  maximum symmtric
+                if (np.min(np.round(np.log(Va)))<=
+                    np.round(log(mean(iso_judge1[isnan(iso_judge1)==0])/
+                    mean(I[isnan(I)==0])/fittness_threshold))):#-3.:
                     if size(np.unique(np.log(Va)))>1:
-                        sym = np.max(sym_fold[np.where(np.round(log(Va))==np.min(np.unique(np.round(log(Va)))))[0]])
-                        if np.max(sym_fold[np.where(np.floor(log(Va))==np.min(np.unique(np.floor(log(Va)))))[0]])>sym:
-                            sym=np.max(sym_fold[np.where(np.floor(log(Va))==np.min(np.unique(np.floor(log(Va)))))[0]])
+                        sym = np.max(sym_fold[
+                                     np.where(np.round(log(Va))==
+                                     np.min(np.unique(np.round(log(Va)))))[0]])
+                        if (np.max(sym_fold[
+                            np.where(np.floor(log(Va))==
+                            np.min(np.unique(np.floor(log(Va)))))[0]])>sym):
+                            sym=np.max(sym_fold[
+                                np.where(np.floor(log(Va))==
+                                np.min(np.unique(np.floor(log(Va)))))[0]])
                     else: sym = np.max(sym_fold[:4])
                 else: sym=0
-        
+
         if (size(Va[Va==6])>0) & (size(Va[Va<extreme_fitness])<1):
-            if (size(Va[Va==6])==1) and (np.min(np.round(np.log(Va)))>np.round(log(mean(iso_judge1[isnan(iso_judge1)==0])/mean(I[isnan(I)==0])/fittness_threshold))):
+            if (size(Va[Va==6])==1) and \
+               (np.min(np.round(np.log(Va)))>\
+               np.round(log(mean(iso_judge1[isnan(iso_judge1)==0])/\
+               mean(I[isnan(I)==0])/fittness_threshold))):
                 sym = sym_fold[Va==6][0]
             elif size(Va[Va==6])>1:
-                sym=np.max(sym_fold[np.where(Va==6)[0]]) 
-        
+                sym=np.max(sym_fold[np.where(Va==6)[0]])
+
         if sym>0:
             I6=np.zeros((angle_resolution/sym,len(aniso_span[i]),sym))
             for k in range(sym):
-                I6[:,:,k] = np.copy(qphi_image2[k*angle_resolution/sym:(k+1)*angle_resolution/sym,aniso_span[i]])
+                I6[:,:,k] = np.copy(qphi_image2
+                                    [k*angle_resolution/sym:(k+1)*
+                                    angle_resolution/sym,aniso_span[i]])
             print(sym,' ',i)
             I7 = np.copy(I6)
             I7[I7==-6]=np.nan
@@ -602,69 +626,92 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
                     if n!=np.argmax(nonnan_size):
                         for m in np.arange(-5,5,1):
                             for mm in np.arange(-5,5,1):
-                                if sym_region_fitness>nanmean(np.abs(TwoD_model-(np.roll(np.roll(qphi_image3,m,axis=-1),mm,axis=0))[n*angle_resolution/sym:(n+1)*angle_resolution/sym,aniso_span[i]])):
-                                    sym_region_fitness=nanmean(np.abs(TwoD_model-(np.roll(np.roll(qphi_image3,m,axis=-1),mm,axis=0))[n*angle_resolution/sym:(n+1)*angle_resolution/sym,aniso_span[i]]))
+                                if sym_region_fitness>nanmean(np.abs(TwoD_model-
+                                   (np.roll(np.roll(qphi_image3,m,axis=-1),
+                                   mm,axis=0))[n*angle_resolution/sym:(n+1)*
+                                   angle_resolution/sym,aniso_span[i]])):
+                                    sym_region_fitness=nanmean(np.abs(TwoD_model
+                                                    -(np.roll(np.roll(qphi_image3,
+                                                    m,axis=-1),mm,axis=0))
+                                                    [n*angle_resolution/
+                                                    sym:(n+1)*
+                                                    angle_resolution/
+                                                    sym,aniso_span[i]]))
                                     sym_region_shift_c[n]=m
                                     sym_region_shift_r[n]=mm
-                        I7[:,:,n]=(np.roll(np.roll(qphi_image3,sym_region_shift_c[n],axis=-1),sym_region_shift_r[n],axis=0))[n*angle_resolution/sym:(n+1)*angle_resolution/sym,aniso_span[i]]
-                
+                        I7[:,:,n]=(np.roll(np.roll(qphi_image3,
+                                          sym_region_shift_c[n],axis=-1),
+                                          sym_region_shift_r[n],axis=0))
+                                          [n*angle_resolution/sym:(n+1)*
+                                          angle_resolution/sym,aniso_span[i]]
+
             if np.sum(np.sum(nanmean(I7,axis=2)))==NaN:
                 if diffuse==False:
                     from skimage import restoration
-                    TwoD_model = restoration.inpaint_biharmonic(nanmean(I7,axis=2),mask=(isnan(nanmean(I7,axis=2))))
+                    TwoD_model = restoration.inpaint_biharmonic(nanmean(I7,axis=2),
+                                                mask=(isnan(nanmean(I7,axis=2))))
                 elif diffuse==True:
                     TwoD_model=nanmean(I7,axis=2)
                     TwoD_healing=exp(np.copy(TwoD_model))
                     TwoD_healing[isnan(TwoD_healing)]=0
                     TwoD_model[isnan(TwoD_model)]=0
                     while size(TwoD_healing[TwoD_healing==0])>0:
-                        TwoD_healing=rank.mean(TwoD_healing.astype(uint16),np.ones((5,5)),mask=(TwoD_healing!=0))
-                    TwoD_model[TwoD_model==0]=log((TwoD_healing[TwoD_model==0]).astype(float))
-            
+                        TwoD_healing=rank.mean(TwoD_healing.astype(uint16),
+                                              np.ones((5,5)),
+                                              mask=(TwoD_healing!=0))
+                    TwoD_model[TwoD_model==0]=log((TwoD_healing
+                                                   [TwoD_model==0]).astype(float))
+
             I6[I6==-6]=np.nan
             for k in range(sym):
                 fit_model=np.zeros((shape(TwoD_model)))
-                fit_model=np.roll(np.roll(TwoD_model,-sym_region_shift_c[k],axis=-1),-sym_region_shift_r[k],axis=0)
-                fit_model[:,:sym_region_shift_c[k]]=np.copy(TwoD_model[:,:sym_region_shift_c[k]])
+                fit_model=np.roll(np.roll(TwoD_model,
+                                  -sym_region_shift_c[k],axis=-1),
+                                  -sym_region_shift_r[k],axis=0)
+                fit_model[:,:sym_region_shift_c[k]]=np.copy(TwoD_model
+                                                      [:,:sym_region_shift_c[k]])
                 I6[:,:,k][isnan(I6[:,:,k])==1]=fit_model[isnan(I6[:,:,k])==1]
-                qphi_image2[k*angle_resolution/sym:(k+1)*angle_resolution/sym,aniso_span[i]]=I6[:,:,k]
-            #iso_judge[aniso_span[i]]=1*sym   
-        else:# here anisotropic is caused by the background noise no due to symmetrical fold 
+                qphi_image2[k*angle_resolution/sym:
+                (k+1)*angle_resolution/sym,aniso_span[i]] = I6[:,:,k]
+            #iso_judge[aniso_span[i]]=1*sym
+        else:# here anisotropic is caused by the background noise no due to symmetrical fold
             iso_judge[aniso_span[i]]=0
-    
+
     if aniso_bkgd_judge==True:
         qphi_image2[isnan(qphi_image2)]=0
         qphi_image6=exp(np.roll(qphi_image2,-90,axis=0))+qphi_image_L2
     else: qphi_image6=exp(np.roll(qphi_image2,-90,axis=0))
-    
-    
-    
-    
+
+
+
+
     #print time.time()-t#3
     #radius,azimuth=polar_coord(im,xcenter,ycenter,bins)
     aniso_span1 = consecutive(np.where(iso_judge)[0])
     aniso_area=aniso_span1[0]
     for s in range(1,len(aniso_span1)):
         aniso_area=np.append(aniso_area,aniso_span1[s])
-    
-    
+
+
     im2=np.copy(im)
     if aniso_bkgd_judge==True:
         for l in range(r_min,r_max):
             IR = im2[radius==l]
-            FR = interp(a_f[radius==l],np.arange(0,angle_resolution,1)[isnan(qphi_image6[:,l])==0],qphi_image6[isnan(qphi_image6[:,l])==0,l])
+            FR = interp(a_f[radius==l],np.arange(0,angle_resolution,1)
+                 [isnan(qphi_image6[:,l])==0],qphi_image6[isnan(qphi_image6[:,l])==0,l])
             IR[isnan(IR)]=FR[isnan(IR)]
-            im2[radius==l]= IR  
+            im2[radius==l]= IR
         print('aniso_bkgd symmetric')
-        print(bkgd_sym) 
+        print(bkgd_sym)
     elif aniso_bkgd_judge==False:
         for l in range(r_min,r_max):
             if l in aniso_area:
                 IR = im2[radius==l]
-                FR = interp(a_f[radius==l],np.arange(0,angle_resolution,1)[isnan(qphi_image6[:,l])==0],qphi_image6[isnan(qphi_image6[:,l])==0,l])
+                FR = interp(a_f[radius==l],np.arange(0,angle_resolution,1)
+                     [isnan(qphi_image6[:,l])==0],qphi_image6[isnan(qphi_image6[:,l])==0,l])
                 IR[isnan(IR)]=FR[isnan(IR)]
                 im2[radius==l]= IR
-            else: 
+            else:
                 IR = im[radius==l]
                 IR[isnan(IR)] = I[l]
                 im2[radius==l] = IR
