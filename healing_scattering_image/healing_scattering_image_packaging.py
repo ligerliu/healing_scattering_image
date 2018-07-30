@@ -180,7 +180,7 @@ def qphi_image(im,xcenter,ycenter,r_min,r_max,bins):
     return qphi_image
 
 
-def apply_two_fold_symmetry(im):
+def apply_two_fold_symmetry(im,xcenter,ycenter):
 
     imul = np.zeros((np.round(np.max([shape(im)[0]-ycenter,ycenter]))*2,np.round(np.max([shape(im)[1]-xcenter,xcenter]))*2))*np.nan
     imul[:shape(im)[0],:shape(im)[1]] = np.copy(im)
@@ -641,7 +641,7 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
                                     sym_region_shift_r[n]=mm
                         I7[:,:,n]=(np.roll(np.roll(qphi_image3,
                                           sym_region_shift_c[n],axis=-1),
-                                          sym_region_shift_r[n],axis=0))
+                                          sym_region_shift_r[n],axis=0))\
                                           [n*angle_resolution/sym:(n+1)*
                                           angle_resolution/sym,aniso_span[i]]
 
@@ -674,7 +674,8 @@ def image_healing(im,xcenter,ycenter,mask,r_max,r_min,angle_resolution=720,bkdg_
                 qphi_image2[k*angle_resolution/sym:
                 (k+1)*angle_resolution/sym,aniso_span[i]] = I6[:,:,k]
             #iso_judge[aniso_span[i]]=1*sym
-        else:# here anisotropic is caused by the background noise no due to symmetrical fold
+        else:
+            # here anisotropic is caused by the background noise no due to symmetrical fold
             iso_judge[aniso_span[i]]=0
 
     if aniso_bkgd_judge==True:
