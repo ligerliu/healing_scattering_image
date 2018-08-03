@@ -1,7 +1,6 @@
 #import time
 import numpy as np
 import matplotlib.pyplot as plt # for showing image
-from pylab import * # for multiple figure window
 import os
 #from lmfit import Model
 import sys
