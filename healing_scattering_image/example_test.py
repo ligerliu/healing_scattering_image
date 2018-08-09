@@ -8,10 +8,11 @@ from skimage.filters import median
 from skimage.transform import resize
 from healing_scattering_image.heal_scatter_image import heal_scattering_image
 import os
+from pkg_resources import resource_filename
 
-address = '/Users/jiliangliu/healing_scattering_image/healing_scattering_image'
-os.chdir(address)
-sample_name = 'example_1.npz'
+path = resource_filename('healing_scattering_image',\
+                         'example_data/example_1.npz')
+sample_name = path
 im = np.double(np.load(sample_name)['im'])
 im += 1.
 mask = np.load(sample_name)['mask']
@@ -55,5 +56,5 @@ two_fold_apply = True,
 fittness_prior=True,
 down_sample = 0.1,)
 
-plt.imshow(np.log(healed_im),vmin=1,vmax=10)
-plt.show()
+#plt.imshow(np.log(healed_im),vmin=1,vmax=10)
+#plt.show()

@@ -247,7 +247,7 @@ def determine_scattering_class(iso_judge_global,
     lambda_local_vs_global = curve_fit(poisson_func,k,x1/np.nansum(x1),\
                             p0 = np.max([np.argmax(x1),0.5]),
                             bounds = [np.argmax(x1)-1,np.argmax(x1)+1])[0][0]
-    print(np.abs(1-y1[lambda_local_vs_global.astype(int)]),lambda_global)
+    #print(np.abs(1-y1[lambda_local_vs_global.astype(int)]),lambda_global)
     if (np.abs(1-y1[lambda_local_vs_global.astype(int)]) < bkgd_threshold):
        aniso_bkgd_judge = False
        if lambda_global <= peaks_threshold:
@@ -1147,96 +1147,98 @@ def heal_aniso_bkgd_peaks(
     return im2,aniso_judge,sym_record,qphi_image_6
 
 
-def heal_scattering_image(
-                          im,
-                          mask,
-                          xcenter,
-                          ycenter,
-                          r_min,
-                          r_max,
-                          angle_resolution,
-                          delta_width,
-                          bkgd_threshold,
-                          peaks_threshold,
-                          bins = 30,
-                          lambda_threshold_1 = 2.,
-                          lambda_threshold_2 = 2.,
-                          bkgd_fit_bias = 4.,
-                          fold_bias = 4.,
-                          fittness_threshold = 64,
-                          extreme_fitness = 1e-3,
-                          two_fold_apply = True,
-                          fittness_prior=True,
-                          down_sample = 0.1,
-                          fitting_shift = True
-                          ):
-    '''
+def heal_scatter_image(im,
+                       mask,
+                       xcenter,
+                       ycenter,
+                       r_min,
+                       r_max,
+                       angle_resolution,
+                       delta_width,
+                       bkgd_threshold,
+                       peaks_threshold,
+                       bins = 30,
+                       lambda_threshold_1 = 2.,
+                       lambda_threshold_2 = 2.,
+                       bkgd_fit_bias = 4.,
+                       fold_bias = 4.,
+                       fittness_threshold = 64,
+                       extreme_fitness = 1e-3,
+                       two_fold_apply = True,
+                       fittness_prior=True,
+                       down_sample = 0.1,
+                       fitting_shift = True):
+    """
     Heal Scattering Image basing on Physical features.
     See paper: Liu, Jiliang, et al. "Healing X-ray scattering images."
-               IUCrJ 4.4 (2017): 455-465.
+    IUCrJ 4.4 (2017): 455-465.
+
+    Due to qphi image will have very low azimuth resolution at low angle
+    region, if there is pattern very close beam center, which pixel distance
+    less than 40 pixel, we would like to up size sample first.
+    Usually 500x500 or 1000x1000 size image could be well processedself.
+    This is how default parameters or paratmeters in example determinedself.
 
     Parameters
-    -----------
-      im: 2D numpy.array
+    ----------
+    im: 2D numpy.array
           input scattering image with gaps and defects,
-      mask: 2D numpy.array
+    mask: 2D numpy.array
           the area want to mask in scattering image,, like beamstop, gaps,
-      xcenter: pixel float
+    xcenter: pixel float
           the beamcenter column,
-      ycenter: pixel float
+    ycenter: pixel float
           the beam center row,
-      r_min: pixel float
+    r_min: pixel float
           the start of healing,
-      r_max: pixel float
+    r_max: pixel float
           the end of healing,
-      angle_resolution: float
+    angle_resolution: float
           angle resolution of qphi map,
-      delta_width: float,
-      bkgd_threshold: float,
-      peaks_threshold: float,
-      bins: float,
-      lambda_threshold_1: float,
-      lambda_threshold_2: float,
-      bkgd_fit_bias: float,
-      fold_bias: float,
-      fittness_threshold: float,
-      extreme_fitness: float,
-      two_fold_apply: Boolean,
-      fittness_prior: Boolean,
-      down_sample: float
+    delta_width: float
+    bkgd_threshold: float
+    peaks_threshold: float
+    bins: float
+    lambda_threshold_1: float
+    lambda_threshold_2: float
+    bkgd_fit_bias: float
+    fold_bias: float
+    fittness_threshold: float
+    extreme_fitness: float
+    two_fold_apply: Boolean
+    fittness_prior: Boolean
+    down_sample: float
           between (0,1),
-      fitting_shift; Boolean:
-          allow small shift when heal the symmetrical patterns
+    fitting_shift: Boolean
+          allow small shift when heal the symmetrical patterns.
+
     Returns
-    -----------
-       im; 2D numpy.array
+    -------
+    im: 2D numpy.array
           healed scattering image,
-       aniso_judge: Boolean
+    aniso_judge: Boolean
           identify peaks with symmertical folds,
-       sym_record: float
+    sym_record: float
           symmetrical fold,
-       iso_judge_global: 1D numpy.array
+    iso_judge_global: 1D numpy.array
           global standard deviation,
-       iso_local_vs_global: 1D nummpy.array
+    iso_local_vs_global: 1D nummpy.array
           local vs global standard deviation,
-       qphi_image_6: 2D numpy.array
+    qphi_image_6: 2D numpy.array
           healed qphi map,
-       I: 1D numpy array
-          circular averaged intensity
-    '''
+    I: 1D numpy array
+          circular averaged intensity.
+    """
+
     radius,azimuth = polar_coord(im,xcenter,ycenter,angle_resolution)
     r_f,a_f = polar_coord_float(im,xcenter,ycenter,angle_resolution)
-
     if two_fold_apply == True:
         im = apply_two_fold_symmetry(im,xcenter,ycenter)
     else:
         im = np.copy(im)
-    #im[im<1] = 1
+#    im[im<1] = 1
     I = oneD_intensity(im=im,xcenter=xcenter,ycenter=ycenter,mask=mask).cir_ave()
-    #fig,ax = plt.subplots()
-    #ax.plot(I)
     I = I[:r_max]
-
     qphi_image_1,qphi_image_2,\
     qphi_image_3,qphi_transform_mask,\
                  qphi_image_mask = calculate_qphi_image(im,
@@ -1245,7 +1247,6 @@ def heal_scattering_image(
                                                         r_min,
                                                         r_max,
                                                         angle_resolution)
-
     iso_judge_global,iso_local_vs_global = two_iso_judge(r_max,
                                                          qphi_image_3,
                                                          delta_width,
@@ -1258,13 +1259,6 @@ def heal_scattering_image(
                                    bkgd_threshold,
                                    peaks_threshold,
                                    hist_bins = bins)
-    #if lambda_global < 1:
-    #    lambda_global = 1
-    #if lambda_local_vs_global < 1:
-    #    lambda_local_vs_global = 1
-    #peaks_judge = True
-    #aniso_bkgd_judge = False
-    print(aniso_bkgd_judge,peaks_judge)
     if aniso_bkgd_judge == False and peaks_judge == False:
         im,aniso_judge = heal_iso_bkgd_no_peaks(im,
                                    I,
@@ -1281,7 +1275,6 @@ def heal_scattering_image(
         qphi_image_6 = np.copy(qphi_image_1)
         for _ in range(r_min,r_max):
             qphi_image_6[np.isnan(qphi_image_6[:,_]),_] = I[_]
-
     if aniso_bkgd_judge == False and peaks_judge == True:
         im,aniso_judge,sym_record,\
         qphi_image_6 = heal_iso_bkgd_peaks(im,
@@ -1307,7 +1300,6 @@ def heal_scattering_image(
                                 extreme_fitness,
                                 fitting_shift
                                 )
-
     if aniso_bkgd_judge == True and peaks_judge == False:
         im,aniso_judge,sym_record = heal_aniso_bkgd_no_peaks(im,
                                 I,
@@ -1332,7 +1324,6 @@ def heal_scattering_image(
                                 extreme_fitness,
                                 fitting_shift
                                 )
-
     if aniso_bkgd_judge == True and peaks_judge == True:
         im,aniso_judge,sym_record,\
         qphi_image_6 = heal_aniso_bkgd_peaks(im,
