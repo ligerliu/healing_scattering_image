@@ -6,6 +6,11 @@ cache:
     - $HOME/.cache/pip
     - $HOME/.ccache  # https://github.com/travis-ci/travis-ci/issues/5853
 
+env:
+  global:
+    #Doctr deploy key for ligerliu/healing_scattering_image
+    - secure: "<REDACTED>"
+
 install:
   # Install this package and the packages listed in requirements.txt.
   - pip install .
@@ -16,5 +21,8 @@ script:
   - coverage run -m pytest  # Run the tests and check for test coverage.
   - coverage report -m  # Generate test coverage report.
   - codecov  # Upload the report to codecov.
-  - flake8 --max-line-length=115  # Enforce code style (but relax line length limit a bit).
+  #- flake8 --max-line-length=115  # Enforce code style (but relax line length limit a bit).
+  - set -e
   - make -C docs html  # Build the documentation.
+  - pip install doctr
+  - doctr deploy --built-docs docs/build/html . #publish the documentation
