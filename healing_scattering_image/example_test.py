@@ -6,7 +6,7 @@ from scipy import ndimage
 plt.close('all')
 from skimage.filters import median
 from skimage.transform import resize
-from healing_scattering_image.heal_scatter_image import heal_scattering_image
+from healing_scattering_image.heal_scatter_image import heal_scatter_image
 import os
 from pkg_resources import resource_filename
 
@@ -36,7 +36,7 @@ bkgd_threshold  = 0.3
 peaks_threshold = 4
 healed_im, aniso_place, sym_record,\
 iso_judge_global , iso_local_vs_global,\
-qphi_image_6, I = heal_scattering_image(im,mask,
+qphi_image, I = heal_scatter_image(im,mask,
 xcenter,
 ycenter,
 r_min,
