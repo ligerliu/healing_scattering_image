@@ -1158,11 +1158,11 @@ def heal_scatter_image(im,
                        bkgd_threshold,
                        peaks_threshold,
                        bins = 30,
-                       lambda_threshold_1 = 2.,
-                       lambda_threshold_2 = 2.,
+                       lambda_threshold_1 = 1.,
+                       lambda_threshold_2 = 1.,
                        bkgd_fit_bias = 4.,
                        fold_bias = 4.,
-                       fittness_threshold = 64,
+                       fittness_threshold = 1.,
                        extreme_fitness = 1e-3,
                        two_fold_apply = True,
                        fittness_prior=True,
@@ -1196,17 +1196,35 @@ def heal_scatter_image(im,
     angle_resolution: float
           angle resolution of qphi map,
     delta_width: float
+          delta q for standard deviation calultion of every q in qphi map
     bkgd_threshold: float
+          threshold to classify scattering by the histogram of local standard
+          devation verse global deviation. larger threshold will be less senstive
+          to
     peaks_threshold: float
+          threshold determines histogram of global standard deviation
+          larger threshold means only sharp peaks are distinguishable,
     bins: float
+          bins for histogram of standard deviation
     lambda_threshold_1: float
+          lower threshold will allow more data point classified to patterns
+          including anisotropic structrue information,
     lambda_threshold_2: float
+          lower threshold will allow more data point classified to patterns
+          including anisotropic structrue information,
     bkgd_fit_bias: float
+          determine the bias to symmtry judgement of diffuse peaks,
     fold_bias: float
+          determine the bias to symmtry judgement of sharp peaks,
     fittness_threshold: float
+          increase error tolerance for diffuse reflections,
     extreme_fitness: float
+          tolerance of error of symmetr model,
     two_fold_apply: Boolean
+          automatical applied two fold symmetry, usualy true for SAXS,
     fittness_prior: Boolean
+          True will enable algorithm to choose larger symmetry fold with fitting
+          residual less than extreme_fitness,
     down_sample: float
           between (0,1),
     fitting_shift: Boolean
