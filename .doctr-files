@@ -1,3 +1,6 @@
+./_images/usage-1.png
+./_modules/healing_scattering_image/heal_scatter_image.html
+./_modules/index.html
 ./_sources/index.rst.txt
 ./_sources/installation.rst.txt
 ./_sources/release-history.rst.txt
@@ -65,4 +68,8 @@
 ./release-history.html
 ./search.html
 ./searchindex.js
+./usage-1.hires.png
+./usage-1.pdf
+./usage-1.png
+./usage-1.py
 ./usage.html

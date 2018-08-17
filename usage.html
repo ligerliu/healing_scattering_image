@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Usage &mdash; healing_scattering_image 0.post21+g27fd068 documentation</title>
+  <title>Usage &mdash; healing_scattering_image 0.post22+g8d48810 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.post21+g27fd068
+                0.post22+g8d48810
               </div>
             
           
@@ -87,7 +87,12 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plots">Plots</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="release-history.html">Release History</a></li>
 </ul>
 
@@ -159,6 +164,219 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">healing_scattering_image</span>
 </pre></div>
 </div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="healing_scattering_image.heal_scatter_image.heal_scatter_image">
+<code class="descclassname">healing_scattering_image.heal_scatter_image.</code><code class="descname">heal_scatter_image</code><span class="sig-paren">(</span><em>im</em>, <em>mask</em>, <em>xcenter</em>, <em>ycenter</em>, <em>r_min</em>, <em>r_max</em>, <em>angle_resolution</em>, <em>delta_width</em>, <em>bkgd_threshold</em>, <em>peaks_threshold</em>, <em>bins=30</em>, <em>lambda_threshold_1=1.0</em>, <em>lambda_threshold_2=1.0</em>, <em>bkgd_fit_bias=4.0</em>, <em>fold_bias=4.0</em>, <em>fittness_threshold=1.0</em>, <em>extreme_fitness=0.001</em>, <em>two_fold_apply=True</em>, <em>fittness_prior=True</em>, <em>down_sample=0.1</em>, <em>fitting_shift=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/healing_scattering_image/heal_scatter_image.html#heal_scatter_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#healing_scattering_image.heal_scatter_image.heal_scatter_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Heal Scattering Image basing on Physical features.
+See paper: Liu, Jiliang, et al. “Healing X-ray scattering images.”
+IUCrJ 4.4 (2017): 455-465.</p>
+<p>Due to qphi image will have very low azimuth resolution at low angle
+region, if there is pattern very close beam center, which pixel distance
+less than 40 pixel, we would like to up size sample first.
+Usually 500x500 or 1000x1000 size image could be well processedself.
+This is how default parameters or paratmeters in example determinedself.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>im: 2D numpy.array</strong></dt>
+<dd><p class="first last">input scattering image with gaps and defects,</p>
+</dd>
+<dt><strong>mask: 2D numpy.array</strong></dt>
+<dd><p class="first last">the area want to mask in scattering image,, like beamstop, gaps,</p>
+</dd>
+<dt><strong>xcenter: pixel float</strong></dt>
+<dd><p class="first last">the beamcenter column,</p>
+</dd>
+<dt><strong>ycenter: pixel float</strong></dt>
+<dd><p class="first last">the beam center row,</p>
+</dd>
+<dt><strong>r_min: pixel float</strong></dt>
+<dd><p class="first last">the start of healing,</p>
+</dd>
+<dt><strong>r_max: pixel float</strong></dt>
+<dd><p class="first last">the end of healing,</p>
+</dd>
+<dt><strong>angle_resolution: float</strong></dt>
+<dd><p class="first last">angle resolution of qphi map,</p>
+</dd>
+<dt><strong>delta_width: float</strong></dt>
+<dd><p class="first last">delta q for standard deviation calultion of every q in qphi map</p>
+</dd>
+<dt><strong>bkgd_threshold: float</strong></dt>
+<dd><p class="first last">threshold to classify scattering by the histogram of local standard
+devation verse global deviation. larger threshold will be less senstive
+to</p>
+</dd>
+<dt><strong>peaks_threshold: float</strong></dt>
+<dd><p class="first last">threshold determines histogram of global standard deviation
+larger threshold means only sharp peaks are distinguishable,</p>
+</dd>
+<dt><strong>bins: float</strong></dt>
+<dd><p class="first last">bins for histogram of standard deviation</p>
+</dd>
+<dt><strong>lambda_threshold_1: float</strong></dt>
+<dd><p class="first last">lower threshold will allow more data point classified to patterns
+including anisotropic structrue information,</p>
+</dd>
+<dt><strong>lambda_threshold_2: float</strong></dt>
+<dd><p class="first last">lower threshold will allow more data point classified to patterns
+including anisotropic structrue information,</p>
+</dd>
+<dt><strong>bkgd_fit_bias: float</strong></dt>
+<dd><p class="first last">determine the bias to symmtry judgement of diffuse peaks,</p>
+</dd>
+<dt><strong>fold_bias: float</strong></dt>
+<dd><p class="first last">determine the bias to symmtry judgement of sharp peaks,</p>
+</dd>
+<dt><strong>fittness_threshold: float</strong></dt>
+<dd><p class="first last">increase error tolerance for diffuse reflections,</p>
+</dd>
+<dt><strong>extreme_fitness: float</strong></dt>
+<dd><p class="first last">tolerance of error of symmetr model,</p>
+</dd>
+<dt><strong>two_fold_apply: Boolean</strong></dt>
+<dd><p class="first last">automatical applied two fold symmetry, usualy true for SAXS,</p>
+</dd>
+<dt><strong>fittness_prior: Boolean</strong></dt>
+<dd><p class="first last">True will enable algorithm to choose larger symmetry fold with fitting
+residual less than extreme_fitness,</p>
+</dd>
+<dt><strong>down_sample: float</strong></dt>
+<dd><p class="first last">between (0,1),</p>
+</dd>
+<dt><strong>fitting_shift: Boolean</strong></dt>
+<dd><p class="first last">allow small shift when heal the symmetrical patterns.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>im: 2D numpy.array</strong></dt>
+<dd><p class="first last">healed scattering image,</p>
+</dd>
+<dt><strong>aniso_judge: Boolean</strong></dt>
+<dd><p class="first last">identify peaks with symmertical folds,</p>
+</dd>
+<dt><strong>sym_record: float</strong></dt>
+<dd><p class="first last">symmetrical fold,</p>
+</dd>
+<dt><strong>iso_judge_global: 1D numpy.array</strong></dt>
+<dd><p class="first last">global standard deviation,</p>
+</dd>
+<dt><strong>iso_local_vs_global: 1D nummpy.array</strong></dt>
+<dd><p class="first last">local vs global standard deviation,</p>
+</dd>
+<dt><strong>qphi_image_6: 2D numpy.array</strong></dt>
+<dd><p class="first last">healed qphi map,</p>
+</dd>
+<dt><strong>I: 1D numpy array</strong></dt>
+<dd><p class="first last">circular averaged intensity.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="gp">In [2]: </span><span class="kn">from</span> <span class="nn">skimage.draw</span> <span class="kn">import</span> <span class="n">polygon</span>
+
+<span class="gp">In [3]: </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="gp">In [4]: </span><span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">loadmat</span>
+
+<span class="gp">In [5]: </span><span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">ndimage</span>
+
+<span class="gp">In [6]: </span><span class="kn">from</span> <span class="nn">skimage.filters</span> <span class="kn">import</span> <span class="n">median</span>
+
+<span class="gp">In [7]: </span><span class="kn">from</span> <span class="nn">skimage.transform</span> <span class="kn">import</span> <span class="n">resize</span>
+
+<span class="gp">In [8]: </span><span class="kn">import</span> <span class="nn">healing_scattering_image</span>
+
+<span class="gp">In [9]: </span><span class="kn">from</span> <span class="nn">healing_scattering_image.heal_scatter_image</span> <span class="kn">import</span> <span class="n">heal_scatter_image</span>
+
+<span class="gp">In [10]: </span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="gp">In [11]: </span><span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span>
+
+<span class="gp">In [12]: </span><span class="n">path</span> <span class="o">=</span> <span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;healing_scattering_image&#39;</span><span class="p">,</span>\
+<span class="gp">   ....: </span>                         <span class="s1">&#39;example_data/example_1.npz&#39;</span><span class="p">)</span>
+<span class="gp">   ....: </span>
+
+<span class="gp">In [13]: </span><span class="n">sample_name</span> <span class="o">=</span> <span class="n">path</span>
+
+<span class="gp">In [14]: </span><span class="n">im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sample_name</span><span class="p">)[</span><span class="s1">&#39;im&#39;</span><span class="p">])</span>
+
+<span class="gp">In [15]: </span><span class="n">im</span> <span class="o">+=</span> <span class="mf">1.</span>
+
+<span class="gp">In [16]: </span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sample_name</span><span class="p">)[</span><span class="s1">&#39;mask&#39;</span><span class="p">]</span>
+
+<span class="gp">In [17]: </span><span class="kn">from</span> <span class="nn">skimage.transform</span> <span class="kn">import</span> <span class="n">resize</span>
+
+<span class="go">#im = resize(im,(int(np.shape(im)[0]/2),int(np.shape(im)[1]/2)))</span>
+<span class="go">#mask = resize(mask,(int(np.shape(mask)[0]/2),int(np.shape(mask)[1]/2)))</span>
+<span class="gp">In [18]: </span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+
+<span class="gp">In [19]: </span><span class="n">im</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+<span class="gp">In [20]: </span><span class="n">xcenter</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sample_name</span><span class="p">)[</span><span class="s1">&#39;xcenter&#39;</span><span class="p">])</span><span class="c1">#/2</span>
+
+<span class="gp">In [21]: </span><span class="n">ycenter</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sample_name</span><span class="p">)[</span><span class="s1">&#39;ycenter&#39;</span><span class="p">])</span><span class="c1">#/2</span>
+
+<span class="gp">In [22]: </span><span class="n">r_min</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="gp">In [23]: </span><span class="n">r_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="c1">#int(np.max(np.shape(im)))</span>
+
+<span class="gp">In [24]: </span><span class="n">angle_resolution</span> <span class="o">=</span> <span class="mi">360</span>
+
+<span class="gp">In [25]: </span><span class="n">delta_width</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="gp">In [26]: </span><span class="n">bkgd_threshold</span>  <span class="o">=</span> <span class="mf">0.3</span>
+
+<span class="gp">In [27]: </span><span class="n">peaks_threshold</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="gp">In [28]: </span><span class="n">healed_im</span><span class="p">,</span> <span class="n">aniso_place</span><span class="p">,</span> <span class="n">sym_record</span><span class="p">,</span>\
+
+<span class="gp">In [28]: </span><span class="n">iso_judge_global</span> <span class="p">,</span> <span class="n">iso_local_vs_global</span><span class="p">,</span>\
+
+<span class="gp">In [28]: </span><span class="n">qphi_image_6</span><span class="p">,</span> <span class="n">I</span> <span class="o">=</span> <span class="n">heal_scatter_image</span><span class="p">(</span><span class="n">im</span><span class="p">,</span><span class="n">mask</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">xcenter</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">ycenter</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">r_min</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">r_max</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">angle_resolution</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">delta_width</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">bkgd_threshold</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">peaks_threshold</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">bins</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">lambda_threshold_1</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">lambda_threshold_2</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">bkgd_fit_bias</span> <span class="o">=</span> <span class="mf">4.</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">fold_bias</span> <span class="o">=</span> <span class="mf">6.</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">fittness_threshold</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">extreme_fitness</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">two_fold_apply</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">fittness_prior</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<span class="gp">   ....: </span>                                      <span class="n">down_sample</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,)</span>
+<span class="gp">   ....: </span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="plots">
+<h2>Plots<a class="headerlink" href="#plots" title="Permalink to this headline">¶</a></h2>
+<div class="figure">
+<img alt="_images/usage-1.png" src="_images/usage-1.png" />
+</div>
+</div>
 </div>
 
 
@@ -203,7 +421,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.post21+g27fd068',
+            VERSION:'0.post22+g8d48810',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
