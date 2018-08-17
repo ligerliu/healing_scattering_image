@@ -56,5 +56,5 @@ two_fold_apply = True,
 fittness_prior=True,
 down_sample = 0.1,)
 
-#plt.imshow(np.log(healed_im),vmin=1,vmax=10)
-#plt.show()
+plt.imshow(np.log(healed_im),vmin=1,vmax=10)
+plt.show()
