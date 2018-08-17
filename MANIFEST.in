@@ -2,6 +2,7 @@ include AUTHORS.rst
 include CONTRIBUTING.rst
 include LICENSE
 include README.rst
+include example_data/example_1.npz
 
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]

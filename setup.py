@@ -54,7 +54,7 @@ setup(
             # When adding files here, remember to update MANIFEST.in as well,
             # or else they will not be included in the distribution on PyPI!
             # 'path/to/data_file',
-            ]
+            'example_data/example_1.npz',]
         },
     install_requires=requirements,
     license="BSD (3-clause)",
