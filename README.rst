@@ -17,4 +17,6 @@ judge the structrual symmetry and heal the defects  within scattering image
 Features
 --------
 
-* TODO
+* heal the masked data within SAXS
+* identify the structural symmetry
+* output q_azimuth mapping
